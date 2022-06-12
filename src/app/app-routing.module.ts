@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AboutComponent } from './components/pages/about/about.component';
 import { HomeComponent } from './components/pages/home/home.component';
+import { MomentComponent } from './components/pages/moment/moment.component';
 import { NewMomentComponent } from './components/pages/new-moment/new-moment.component';
 
 const routes: Routes = [
@@ -16,6 +17,10 @@ const routes: Routes = [
   {
     path: 'moments/new',
     component: NewMomentComponent,
+  },
+  {
+    path: 'moments/:id',  // Id é um parametro dinâmico para dar um get no momento
+    component: MomentComponent,
   },
 ];
 
