@@ -1,14 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import {
+  FormGroup,
+  FormControl,
+  Validators,
+  FormGroupDirective,
+} from '@angular/forms';
 
 import { MomentService } from 'src/app/service/moment.service';
 import { MessagesService } from 'src/app/service/messages.service';
+import { CommentService } from 'src/app/service/comment.service';
 
 import { Moment } from 'src/app/Moment';
+import { Comment } from 'src/app/Comment';
 
 import { environment } from 'src/environments/environment';
 
-import { faTimes, faEdit} from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-moment',
@@ -17,14 +25,17 @@ import { faTimes, faEdit} from '@fortawesome/free-solid-svg-icons';
 })
 export class MomentComponent implements OnInit {
   moment?: Moment;
-  baseApiUrl = environment.baseApiUrl
-  faTimes = faTimes
-  faEdit = faEdit
+  baseApiUrl = environment.baseApiUrl;
+  faTimes = faTimes;
+  faEdit = faEdit;
+
+  commentForm!: FormGroup;
 
   constructor(
     private momentService: MomentService,
-    private route: ActivatedRoute,
+    private commentService: CommentService,
     private messagesServive: MessagesService,
+    private route: ActivatedRoute,
     private router: Router
   ) {}
 
@@ -35,13 +46,45 @@ export class MomentComponent implements OnInit {
     this.momentService.getMoment(id).subscribe((item) => {
       this.moment = item.data;
     });
+
+    this.commentForm = new FormGroup({
+      text: new FormControl('', Validators.required),
+      username: new FormControl('', Validators.required),
+    });
   }
 
-  async removeHandler(id: number){
-    await this.momentService.removeMoment(id).subscribe()
+  get text() {
+    return this.commentForm.get('text')!;
+  }
 
-    this.messagesServive.add("Momento exclúido com sucesso!")
+  get username() {
+    return this.commentForm.get('username')!;
+  }
 
-    this.router.navigate(['/'])
+  async removeHandler(id: number) {
+    await this.momentService.removeMoment(id).subscribe();
+
+    this.messagesServive.add('Momento exclúido com sucesso!');
+
+    this.router.navigate(['/']);
+  }
+
+  async onSubmit(formDirective: FormGroupDirective) {
+    if (this.commentForm.invalid) {
+      return;
+    }
+    const data: Comment = this.commentForm.value;
+
+    data.momentId = Number(this.moment!.id);
+
+    await this.commentService
+      .createComment(data)
+      .subscribe((comment) => this.moment!.comments!.push(comment.data));
+
+    this.messagesServive.add('Comentário adicionado!');
+
+    //reset form
+    this.commentForm.reset();
+    formDirective.resetForm();
   }
 }

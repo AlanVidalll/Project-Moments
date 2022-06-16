@@ -10,15 +10,18 @@ import { Moment } from 'src/app/Moment';
 export class MomentFormComponent implements OnInit {
   @Output() onSubmit = new EventEmitter<Moment>(); // envia dados para componente pai
   @Input() btnText!: string; // Recebe o dado via props
+  @Input() momentData: Moment | null = null; // Recebe o dado via props
 
   momentForm!: FormGroup;
   constructor() {}
 
   ngOnInit(): void {
     this.momentForm = new FormGroup({
-      id: new FormControl(''),
-      title: new FormControl('', [Validators.required]),
-      description: new FormControl('', [Validators.required]),
+      id: new FormControl(this.momentData ? this.momentData.id : ''),
+      title: new FormControl(this.momentData ? this.momentData.title : '', [
+        Validators.required,
+      ]),
+      description: new FormControl(this.momentData ? this.momentData.description :'', [Validators.required]),
       image: new FormControl(''),
     });
   }
@@ -41,6 +44,6 @@ export class MomentFormComponent implements OnInit {
       return;
     }
     console.log(this.momentForm.value);
-    this.onSubmit.emit(this.momentForm.value) //enviando dados do formulário para componente pai
+    this.onSubmit.emit(this.momentForm.value); //enviando dados do formulário para componente pai
   }
 }
