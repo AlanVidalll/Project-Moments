@@ -59,6 +59,7 @@ input[type="submit"]:hover {
 }
 
 .validation-error p {
+  text-align: left;
   color: #dc3545;
   margin-top: 0.4em;
   border-left: 3px solid #dc3545;
